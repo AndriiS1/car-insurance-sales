@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>CarInsuranceSales</RootNamespace>
+        <UserSecretsId>2a4838d0-3675-41e3-9c27-36f0fbb3b393</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>

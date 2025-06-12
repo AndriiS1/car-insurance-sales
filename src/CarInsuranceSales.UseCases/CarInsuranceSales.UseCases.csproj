@@ -8,10 +8,15 @@
 
     <ItemGroup>
       <PackageReference Include="MediatR" Version="12.5.0" />
+      <PackageReference Include="Telegram.Bot" Version="22.5.1" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\CarInsuranceSales.Infrastructure\CarInsuranceSales.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Queries\" />
     </ItemGroup>
 
 </Project>
