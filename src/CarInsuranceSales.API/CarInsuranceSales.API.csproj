@@ -11,4 +11,9 @@
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\CarInsuranceSales.Infrastructure\CarInsuranceSales.Infrastructure.csproj" />
+      <ProjectReference Include="..\CarInsuranceSales.UseCases\CarInsuranceSales.UseCases.csproj" />
+    </ItemGroup>
+
 </Project>
