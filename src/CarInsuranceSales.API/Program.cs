@@ -1,5 +1,9 @@
 using CarInsuranceSales.Infrastructure;
 using CarInsuranceSales.UseCases;
+using CarInsuranceSales.UseCases.Services;
+using Microsoft.AspNetCore.Mvc;
+using Telegram.Bot.Types;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
@@ -15,28 +19,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+app.MapPost("/bot/update", async ([FromBody] Update update, [FromServices] ICommandProcessor commandProcessor) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    await commandProcessor.Process(update);
+    
+    return Results.Ok();
+});
 
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
+await app.SetWebhookUrl();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

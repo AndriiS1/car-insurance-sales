@@ -1,5 +1,5 @@
-using CarInsuranceSales.UseCases.Services.TelegramBot;
-using CarInsuranceSales.UseCases.Services.TelegramBot.Options;
+using CarInsuranceSales.UseCases.Options;
+using CarInsuranceSales.UseCases.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +12,7 @@ public static class HostBuilderExtensions
     {
         builder.AddMediatr();
         builder.AddTelegramBot();
+        builder.AddServices();
     }
     
     private static void AddMediatr(this WebApplicationBuilder builder)
@@ -21,8 +22,12 @@ public static class HostBuilderExtensions
 
     private static void AddTelegramBot(this WebApplicationBuilder builder)
     {
-        var configuration = builder.Configuration;
+        builder.Services.AddSingleton<ITelegramBotClient>(_ =>
+            new TelegramBotClient(GetOptions(builder.Configuration).ApiToken));
+    }
 
+    private static TelegramBotOptions GetOptions(IConfiguration configuration)
+    {
         var optionsSection = configuration.GetSection(TelegramBotOptions.Section);
         var telegramBotOptions = optionsSection.Get<TelegramBotOptions>();
 
@@ -30,9 +35,19 @@ public static class HostBuilderExtensions
         {
             throw new ArgumentNullException(nameof(telegramBotOptions));
         }
+
+        return telegramBotOptions;
+    }
+
+    private static void AddServices(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddSingleton<ICommandProcessor, CommandProcessor>();
+    }
+    
+    public static async Task SetWebhookUrl(this WebApplication webApplication)
+    {
+        var botClient = webApplication.Services.GetRequiredService<ITelegramBotClient>();
         
-        builder.Services.AddSingleton<ITelegramBotClient>(_ =>
-            new TelegramBotClient(telegramBotOptions.ApiToken));
-        builder.Services.AddHostedService<TelegramBotService>();
+        await botClient.SetWebhook(GetOptions(webApplication.Configuration).WebhookUrl);
     }
 }
