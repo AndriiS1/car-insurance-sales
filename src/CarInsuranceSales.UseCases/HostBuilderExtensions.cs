@@ -1,5 +1,6 @@
 using CarInsuranceSales.UseCases.Options;
-using CarInsuranceSales.UseCases.Services;
+using CarInsuranceSales.UseCases.Services.CommandProcessor;
+using CarInsuranceSales.UseCases.Services.FileService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,7 +42,8 @@ public static class HostBuilderExtensions
 
     private static void AddServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddSingleton<ICommandProcessor, CommandProcessor>();
+        builder.Services.AddScoped<ICommandProcessor, CommandProcessor>();
+        builder.Services.AddScoped<IFileService, FileService>();
     }
     
     public static async Task SetWebhookUrl(this WebApplication webApplication)

@@ -1,5 +1,5 @@
 using Telegram.Bot.Types;
-namespace CarInsuranceSales.UseCases.Services;
+namespace CarInsuranceSales.UseCases.Services.CommandProcessor;
 
 public interface ICommandProcessor
 {

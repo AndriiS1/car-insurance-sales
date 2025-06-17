@@ -6,4 +6,5 @@ public class User
     public required long ExternalUserId { get; init; }
     public required UserState CurrentState { get; set; }
     public required DateTime Created { get; init; }
+    public ICollection<Conversation.Conversation> Conversations { get; } = new List<Conversation.Conversation>();
 }

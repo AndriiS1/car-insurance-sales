@@ -3,11 +3,11 @@ using MediatR;
 using Telegram.Bot;
 namespace CarInsuranceSales.UseCases.Commands.Cancel;
 
-public class StartCommandHandler(ITelegramBotClient botClient, IUserRepository userRepository) : IRequestHandler<Cancel.CancelCommand>
+public class CancelCommandHandler(ITelegramBotClient botClient, IUserRepository userRepository) : IRequestHandler<CancelCommand>
 {
-    public async Task Handle(Cancel.CancelCommand request, CancellationToken cancellationToken)
+    public async Task Handle(CancelCommand request, CancellationToken cancellationToken)
     {
-        const string welcomeText = "The flow is canceled. To start over input /start command.";
+        const string canceledText = "The flow is canceled. To start over input /start command.";
 
         request.User.CurrentState = UserState.Idle;
 
@@ -15,7 +15,7 @@ public class StartCommandHandler(ITelegramBotClient botClient, IUserRepository u
         
         await botClient.SendMessage(
             chatId: request.Message.Chat.Id,
-            text: welcomeText,
+            text: canceledText,
             cancellationToken: cancellationToken
         );
     }

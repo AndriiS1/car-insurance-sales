@@ -1,3 +1,5 @@
+using CarInsuranceSales.Domain.Models.Conversation;
+using CarInsuranceSales.Domain.Models.Document;
 using CarInsuranceSales.Domain.Models.User;
 using CarInsuranceSales.Infrastructure.Database;
 using CarInsuranceSales.Infrastructure.Database.Repositories;
@@ -35,5 +37,7 @@ public static class HostBuilderExtensions
     private static void ConfigureRepositories(this WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
+        builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
     }
 }

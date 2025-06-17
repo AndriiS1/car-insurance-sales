@@ -8,7 +8,7 @@ using CarInsuranceSales.UseCases.Commands.UploadVehicleDoc;
 using MediatR;
 using Telegram.Bot.Types;
 using User = CarInsuranceSales.Domain.Models.User.User;
-namespace CarInsuranceSales.UseCases.Services;
+namespace CarInsuranceSales.UseCases.Services.CommandProcessor;
 
 public class CommandProcessor(IMediator mediator, IUserRepository userRepository) : ICommandProcessor
 {
@@ -31,7 +31,6 @@ public class CommandProcessor(IMediator mediator, IUserRepository userRepository
             };
             
             await userRepository.Create(newUser);
-            
             await userRepository.SaveChangesAsync();
             
             user = newUser;
@@ -39,7 +38,7 @@ public class CommandProcessor(IMediator mediator, IUserRepository userRepository
 
         return message.Text switch
         {
-            "/start" => new StartCommand(message),
+            "/start" => new StartCommand(message, user),
             "/cancel" => new CancelCommand(message, user),
             _ => user.CurrentState switch
             {
