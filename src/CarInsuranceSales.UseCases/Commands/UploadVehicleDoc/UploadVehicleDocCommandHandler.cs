@@ -5,6 +5,7 @@ using CarInsuranceSales.Domain.Rules;
 using CarInsuranceSales.UseCases.Services.FileService;
 using MediatR;
 using Telegram.Bot;
+using Telegram.Bot.Types.ReplyMarkups;
 namespace CarInsuranceSales.UseCases.Commands.UploadVehicleDoc;
 
 public class UploadVehicleDocCommandHandler(ITelegramBotClient botClient, IUserRepository userRepository, IFileService fileService,
@@ -36,6 +37,12 @@ public class UploadVehicleDocCommandHandler(ITelegramBotClient botClient, IUserR
             ExternalFilePath = file.FilePath!
         };
 
+        var keyboard = new InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton.WithCallbackData("✅ Continue", "doc:confirm"),
+            ]
+        ]);
+        
         await Task.WhenAll(CreateDocumentAsync(document, request.User, cancellationToken), UpdateUser(request.User));
 
         await botClient.SendMessage(request.Message.Chat.Id, "✅ Vehicle doc received. Now, please upload your vehicle registration certificate.", cancellationToken: cancellationToken);
@@ -43,7 +50,7 @@ public class UploadVehicleDocCommandHandler(ITelegramBotClient botClient, IUserR
     
     private async Task CreateDocumentAsync(Document document, User user, CancellationToken cancellationToken)
     {
-        await documentRepository.Create(document);
+        await documentRepository.Upsert(document);
         await documentRepository.SaveChangesAsync();
         
         await fileService.SaveFile(document, user, cancellationToken);

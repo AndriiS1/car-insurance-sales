@@ -4,9 +4,12 @@ using CarInsuranceSales.UseCases.Commands.ConfirmOCR;
 using CarInsuranceSales.UseCases.Commands.ConfirmPrice;
 using CarInsuranceSales.UseCases.Commands.Start;
 using CarInsuranceSales.UseCases.Commands.UploadPassport;
+using CarInsuranceSales.UseCases.Commands.UploadPassport.Continue;
+using CarInsuranceSales.UseCases.Commands.UploadPassport.Reupload;
 using CarInsuranceSales.UseCases.Commands.UploadVehicleDoc;
 using MediatR;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using User = CarInsuranceSales.Domain.Models.User.User;
 namespace CarInsuranceSales.UseCases.Services.CommandProcessor;
 
@@ -14,18 +17,15 @@ public class CommandProcessor(IMediator mediator, IUserRepository userRepository
 {
     private async Task<IRequest?> GetCommandRequest(Update update)
     {
-        var message = update.Message;
-
-        if (message == null) return null;
-
-        var user = await userRepository.GetByExternalUserId(message.Chat.Id);
+        var userId = GetUserId(update);
+        var user = await userRepository.GetByExternalUserId(userId);
         
         if (user is null)
         {
             var newUser = new User
             {
                 CurrentState = UserState.WaitingForPassport,
-                ExternalUserId = message.Chat.Id,
+                ExternalUserId = userId,
                 Id = Guid.NewGuid(),
                 Created = DateTime.Now,
             };
@@ -35,7 +35,24 @@ public class CommandProcessor(IMediator mediator, IUserRepository userRepository
             
             user = newUser;
         }
+        
+        if (update.CallbackQuery is { } callback)
+        {
+            var data = callback.Data;
+            
+            switch (data)
+            {
+                case "doc:continue":
+                    return new ContinuePassportCommand(callback, user);
+                case "doc:reupload":
+                    return new ReuploadPassportCommand(callback, user);
+            }
+        }
 
+        var message = update.Message;
+
+        if (message is null) return null;
+        
         return message.Text switch
         {
             "/start" => new StartCommand(message, user),
@@ -59,5 +76,18 @@ public class CommandProcessor(IMediator mediator, IUserRepository userRepository
         {
             await mediator.Send(request);
         }
+    }
+
+    private static long GetUserId(Update update)
+    {
+        return update.Type switch
+        {
+            UpdateType.Message        => update.Message?.From?.Id,
+            UpdateType.CallbackQuery  => update.CallbackQuery?.From.Id,
+            UpdateType.EditedMessage  => update.EditedMessage?.From?.Id,
+            UpdateType.ChannelPost    => update.ChannelPost?.From?.Id,
+            UpdateType.MyChatMember   => update.MyChatMember?.From.Id,
+            _ => null
+        } ?? throw new InvalidOperationException("Could not determine Telegram user ID");
     }
 }
