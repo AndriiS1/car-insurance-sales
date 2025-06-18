@@ -1,6 +1,5 @@
 using CarInsuranceSales.Domain.Models.Conversation;
 using CarInsuranceSales.Domain.Models.Document;
-using CarInsuranceSales.Domain.Models.User;
 using CarInsuranceSales.Domain.Rules;
 using CarInsuranceSales.UseCases.Services.FileService;
 using MediatR;
@@ -8,7 +7,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 namespace CarInsuranceSales.UseCases.Commands.UploadVehicleDoc;
 
-public class UploadVehicleDocCommandHandler(ITelegramBotClient botClient, IUserRepository userRepository, IFileService fileService,
+public class UploadVehicleDocCommandHandler(ITelegramBotClient botClient, IFileService fileService,
     IDocumentRepository documentRepository, IConversationRepository conversationRepository) : IRequestHandler<UploadVehicleDocCommand>
 {
     public async Task Handle(UploadVehicleDocCommand request, CancellationToken cancellationToken)
@@ -39,27 +38,16 @@ public class UploadVehicleDocCommandHandler(ITelegramBotClient botClient, IUserR
 
         var keyboard = new InlineKeyboardMarkup([
             [
-                InlineKeyboardButton.WithCallbackData("✅ Continue", "doc:confirm"),
+                InlineKeyboardButton.WithCallbackData("✅ Continue", "vehicle_doc:continue"),
+                InlineKeyboardButton.WithCallbackData("❌ Reupload", "vehicle_doc:reupload"),
             ]
         ]);
         
-        await Task.WhenAll(CreateDocumentAsync(document, request.User, cancellationToken), UpdateUser(request.User));
-
-        await botClient.SendMessage(request.Message.Chat.Id, "✅ Vehicle doc received. Now, please upload your vehicle registration certificate.", cancellationToken: cancellationToken);
-    }
-    
-    private async Task CreateDocumentAsync(Document document, User user, CancellationToken cancellationToken)
-    {
         await documentRepository.Upsert(document);
         await documentRepository.SaveChangesAsync();
         
-        await fileService.SaveFile(document, user, cancellationToken);
-    }
+        await fileService.SaveFile(document, request.User, cancellationToken);
 
-    private async Task UpdateUser(User user)
-    {
-        user.CurrentState = UserState.WaitingForVehicleDoc;
-        
-        await userRepository.SaveChangesAsync();
+        await botClient.SendMessage(request.Message.Chat.Id, "✅ Vehicle doc received.", replyMarkup:keyboard, cancellationToken: cancellationToken);
     }
 }

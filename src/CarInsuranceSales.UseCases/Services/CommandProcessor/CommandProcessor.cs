@@ -7,6 +7,8 @@ using CarInsuranceSales.UseCases.Commands.UploadPassport;
 using CarInsuranceSales.UseCases.Commands.UploadPassport.Continue;
 using CarInsuranceSales.UseCases.Commands.UploadPassport.Reupload;
 using CarInsuranceSales.UseCases.Commands.UploadVehicleDoc;
+using CarInsuranceSales.UseCases.Commands.UploadVehicleDoc.Continue;
+using CarInsuranceSales.UseCases.Commands.UploadVehicleDoc.Reupload;
 using MediatR;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -46,6 +48,10 @@ public class CommandProcessor(IMediator mediator, IUserRepository userRepository
                     return new ContinuePassportCommand(callback, user);
                 case "doc:reupload":
                     return new ReuploadPassportCommand(callback, user);
+                case "vehicle_doc:continue":
+                    return new ContinueVehicleDocCommand(callback, user);
+                case "vehicle_doc:reupload":
+                    return new ReuploadVehicleDocCommand(callback, user);
             }
         }
 
