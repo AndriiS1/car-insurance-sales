@@ -1,6 +1,6 @@
 using CarInsuranceSales.Infrastructure;
 using CarInsuranceSales.UseCases;
-using CarInsuranceSales.UseCases.Services.CommandProcessor;
+using CarInsuranceSales.UseCases.CommandRouter;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot.Types;
 
@@ -19,9 +19,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/bot/update", async ([FromBody] Update update, [FromServices] ICommandProcessor commandProcessor) =>
+app.MapPost("/bot/update", async ([FromBody] Update update, [FromServices] ICommandRouter commandRouter) =>
 {
-    await commandProcessor.Process(update);
+    await commandRouter.Process(update);
     
     return Results.Ok();
 });

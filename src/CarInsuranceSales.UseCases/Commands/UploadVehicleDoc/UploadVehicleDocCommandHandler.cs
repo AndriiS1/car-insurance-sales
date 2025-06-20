@@ -1,7 +1,7 @@
 using CarInsuranceSales.Domain.Models.Conversation;
 using CarInsuranceSales.Domain.Models.Document;
 using CarInsuranceSales.Domain.Rules;
-using CarInsuranceSales.UseCases.Services.FileService;
+using CarInsuranceSales.Infrastructure.Services.FileService;
 using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -46,7 +46,7 @@ public class UploadVehicleDocCommandHandler(ITelegramBotClient botClient, IFileS
         await documentRepository.Upsert(document);
         await documentRepository.SaveChangesAsync();
         
-        await fileService.SaveFile(document, request.User, cancellationToken);
+        await fileService.SaveFile(document, cancellationToken);
 
         await botClient.SendMessage(request.Message.Chat.Id, "✅ Vehicle doc received.", replyMarkup:keyboard, cancellationToken: cancellationToken);
     }

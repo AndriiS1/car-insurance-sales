@@ -9,6 +9,7 @@ public class ContinuePassportCommandHandler(ITelegramBotClient botClient, IUserR
     {
         request.User.CurrentState = UserState.WaitingForVehicleDoc;
         
+        await botClient.AnswerCallbackQuery(request.Callback.Id, cancellationToken: cancellationToken);
         await userRepository.SaveChangesAsync();
         await botClient.SendMessage(request.User.ExternalUserId, "Now, please upload your vehicle registration certificate as document.", cancellationToken: cancellationToken);
         await botClient.EditMessageReplyMarkup(
@@ -16,6 +17,5 @@ public class ContinuePassportCommandHandler(ITelegramBotClient botClient, IUserR
             messageId: request.Callback.Message!.MessageId,
             replyMarkup: null,
             cancellationToken: cancellationToken);
-        await botClient.AnswerCallbackQuery(request.Callback.Id, cancellationToken: cancellationToken);
     }
 }

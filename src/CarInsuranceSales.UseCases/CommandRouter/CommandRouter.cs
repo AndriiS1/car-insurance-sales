@@ -13,9 +13,9 @@ using MediatR;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using User = CarInsuranceSales.Domain.Models.User.User;
-namespace CarInsuranceSales.UseCases.Services.CommandProcessor;
+namespace CarInsuranceSales.UseCases.CommandRouter;
 
-public class CommandProcessor(IMediator mediator, IUserRepository userRepository) : ICommandProcessor
+public class CommandRouter(IMediator mediator, IUserRepository userRepository) : ICommandRouter
 {
     private async Task<IRequest?> GetCommandRequest(Update update)
     {

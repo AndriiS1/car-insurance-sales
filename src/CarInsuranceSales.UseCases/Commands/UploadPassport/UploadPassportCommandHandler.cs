@@ -1,7 +1,7 @@
 using CarInsuranceSales.Domain.Models.Conversation;
 using CarInsuranceSales.Domain.Models.Document;
 using CarInsuranceSales.Domain.Rules;
-using CarInsuranceSales.UseCases.Services.FileService;
+using CarInsuranceSales.Infrastructure.Services.FileService;
 using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -39,7 +39,7 @@ public class UploadPassportCommandHandler(ITelegramBotClient botClient, IFileSer
         await documentRepository.Upsert(document);
         await documentRepository.SaveChangesAsync();
         
-        await fileService.SaveFile(document, request.User, cancellationToken);
+        await fileService.SaveFile(document, cancellationToken);
         
         var keyboard = new InlineKeyboardMarkup([
             [

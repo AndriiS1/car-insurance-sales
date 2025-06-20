@@ -14,10 +14,10 @@ public class ConversationRepository(AppDbContext context) : IConversationReposit
     public async Task<Conversation?> GetLastByUserId(Guid userId)
     {
         return await _dbSet
+            .Include(c => c.Documents)
             .Where(c => c.UserId == userId)
             .OrderByDescending(c => c.Created)
             .FirstOrDefaultAsync();
-
     }
     
     public async Task SaveChangesAsync()

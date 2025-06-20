@@ -6,12 +6,12 @@ public class ReuploadPassportCommandHandler(ITelegramBotClient botClient) : IReq
 {
     public async Task Handle(ReuploadPassportCommand request, CancellationToken cancellationToken)
     {
+        await botClient.AnswerCallbackQuery(request.Callback.Id, cancellationToken: cancellationToken);
         await botClient.SendMessage(request.User.ExternalUserId, "Please reupload you passport as an image again", cancellationToken: cancellationToken);
         await botClient.EditMessageReplyMarkup(
             chatId: request.User.ExternalUserId,
             messageId: request.Callback.Message!.MessageId,
             replyMarkup: null,
             cancellationToken: cancellationToken);
-        await botClient.AnswerCallbackQuery(request.Callback.Id, cancellationToken: cancellationToken);
     }
 }

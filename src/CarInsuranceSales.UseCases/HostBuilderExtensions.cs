@@ -1,9 +1,10 @@
+using CarInsuranceSales.Infrastructure.Services.FileService;
+using CarInsuranceSales.UseCases.CommandRouter;
 using CarInsuranceSales.UseCases.Options;
-using CarInsuranceSales.UseCases.Services.CommandProcessor;
-using CarInsuranceSales.UseCases.Services.FileService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Mindee.Extensions.DependencyInjection;
 using Telegram.Bot;
 namespace CarInsuranceSales.UseCases;
 
@@ -42,8 +43,7 @@ public static class HostBuilderExtensions
 
     private static void AddServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddScoped<ICommandProcessor, CommandProcessor>();
-        builder.Services.AddScoped<IFileService, FileService>();
+        builder.Services.AddScoped<ICommandRouter, CommandRouter.CommandRouter>();
     }
     
     public static async Task SetWebhookUrl(this WebApplication webApplication)
